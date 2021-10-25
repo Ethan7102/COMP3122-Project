@@ -38,6 +38,8 @@ orders = db['order']
 app = Flask(__name__)
 
 # get order details
+
+
 @app.route('/order/<order_id>', methods=['GET'])
 def get_order(order_id):
     # get order data by order ID, disable _id coolumn
@@ -56,18 +58,31 @@ def get_active_created_orders(store_id):
     limit = None
     # get data from query string
     if 'limit' in request.args:
-     limit = int(request.args['limit'])
+        limit = int(request.args['limit'])
     if limit is None:
         # get active created orders, disable _id coolumn and sort the orders in ascending order of placed date
         cursor = orders.find({'store.id': store_id, 'current_state': 'CREATED'}, {'_id': 0,
-                            'id': 1, 'current_state': 1, 'placed_at': 1}).sort('placed_at', 1)
-    else:# if the parameter limit exists, the number of orders will be limited with the limitation of such parameter
+                                                                                  'id': 1, 'current_state': 1, 'placed_at': 1}).sort('placed_at', 1)
+    else:  # if the parameter limit exists, the number of orders will be limited with the limitation of such parameter
         cursor = orders.find({'store.id': store_id, 'current_state': 'CREATED'}, {'_id': 0,
-                            'id': 1, 'current_state': 1, 'placed_at': 1}).sort('placed_at', 1).limit(limit)
+                                                                                  'id': 1, 'current_state': 1, 'placed_at': 1}).sort('placed_at', 1).limit(limit)
     # iterate over to get a list of dicts
     dicts = [doc for doc in cursor]
     if len(dicts):  # if it is not empty
-        return jsonify({"orders":dicts}), 200
+        return jsonify({"orders": dicts}), 200
+    else:  # print error message if no order records are found
+        return jsonify({'error': 'not found'}), 404
+
+# get latest canceled orders
+@app.route('/stores/<store_id>/canceled-orders', methods=['GET'])
+def get_active_canceled_orders(store_id):
+    # get active canceled orders, disable _id coolumn and sort the orders in ascending order of placed date
+    cursor = orders.find({'store.id': store_id, 'current_state': 'CANCELED', 'placed_at':{'$gte':'new Date(ISODate().getTime() - 1000 * 60 * 120)'}}, {'_id': 0,
+                                                                              'id': 1, 'current_state': 1, 'placed_at': 1}).sort('placed_at', 1)
+    # iterate over to get a list of dicts
+    dicts = [doc for doc in cursor]
+    if len(dicts):  # if it is not empty
+        return jsonify({"orders": dicts}), 200
     else:  # print error message if no order records are found
         return jsonify({'error': 'not found'}), 404
 
