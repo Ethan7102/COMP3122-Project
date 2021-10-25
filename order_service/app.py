@@ -31,18 +31,24 @@ except pymongo.errors.ServerSelectionTimeoutError:
     print('Access failed. The environment variables about MongoDB are incorrect or the MongoDB server is not available.')
     exit()
 
-# get the University DB
+# get the order DB
 db = client['order']
 orders = db['order']
 
 app = Flask(__name__)
 
-# Return a JSON object with my Student ID and Name.
-@app.route('/me', methods=['GET'])
-def get_me():
-    # return my student information by JSON format
-    return jsonify({"student_id": "20035673D", "name": "Wong Ming Yuen"}), 200
-    
+# get order details
+@app.route('/order/<order_id>', methods=['GET'])
+def get_order(order_id):
+    # get order data by order ID, disable _id coolumn
+    cursor = orders.find({'id': {'$eq': order_id}}, {'_id': 0})
+    # iterate over to get a list of dicts
+    dicts = [doc for doc in cursor]
+    if len(dicts):  # return order details if it is not empty
+        return jsonify(dicts), 200
+    else:  # print error message if no order with the specified order ID is found
+        return jsonify({'error': 'not found'}), 404
+
 # start flask server
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=15000, debug=True)
