@@ -32,12 +32,17 @@ except pymongo.errors.ServerSelectionTimeoutError:
     exit()
 
 # get the University DB
-db = client['university']
-students = db['student']
-takes = db['takes']
+db = client['order']
+orders = db['order']
 
 app = Flask(__name__)
 
+# Return a JSON object with my Student ID and Name.
+@app.route('/me', methods=['GET'])
+def get_me():
+    # return my student information by JSON format
+    return jsonify({"student_id": "20035673D", "name": "Wong Ming Yuen"}), 200
+    
 # start flask server
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=15000, debug=True)

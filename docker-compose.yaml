@@ -5,7 +5,7 @@ services:
     image: order-service
     container_name: order-service
     build:
-      context: ./order
+      context: ./order_service
     ports:
       - 15000:15000
     environment:
@@ -16,14 +16,14 @@ services:
     restart: on-failure
   #run mongodb
   mongo:
-    image: comp3122_project_mongo
+    image: mongo
     container_name: comp3122_project_db
     environment:
       MONGO_INITDB_ROOT_USERNAME: comp3122
       MONGO_INITDB_ROOT_PASSWORD: 12345
       MONGO_INITDB_DATABASE: admin
     volumes:
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - ./order_service/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - mongo_volume:/data/db
 networks:
   default:
