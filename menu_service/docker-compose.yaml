@@ -1,0 +1,17 @@
+version: "3.3"
+services:
+  mongo:
+    image: mongo
+    container_name: db
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: project
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: menu_db
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - mongo_volume:/data/db
+volumes:
+  mongo_volume:
+    name: project_mongo
