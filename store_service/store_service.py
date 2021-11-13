@@ -10,7 +10,7 @@ from flask import request
 from flask import Flask, jsonify
 from urllib.parse import unquote
 from common.utils import check_rsp_code
-from lib.event_store import EventStore
+from prometheus_flask_exporter import PrometheusMetrics
 
 
 app = Flask(__name__)
