@@ -1,5 +1,6 @@
 import redis, json
-
+import uuid
+"""
 pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True)
 db = redis.Redis(connection_pool=pool)
 #a=json.loads({"error":null})
@@ -26,3 +27,24 @@ print(db.hget("hash1", "k1"))    # 单个取hash的key对应的值
 print(db.hmget("hash1", "k1", "k2")) # 多个取hash的key对应的值
 db.hsetnx("hash1", "k2", "v3") # 只能新建
 print(db.hget("hash1", "k2"))
+"""
+
+def create_order(_order_id,_order_state):
+    """
+    Create an order entity.
+
+    :param _order_id: It is the order ID .
+    :param _order_state: It is the order state.
+    :return: A dict with the entity properties.
+    """
+    return {
+        'id': str(uuid.uuid4()),
+        'order_id': _order_id,
+        'order_state': _order_state
+    }
+data = '{"id":"1234","state":"created"}'
+data = json.loads(data)
+
+order=create_order(data["id"],data["state"])
+print(order["id"],order["order_id"], order['order_state'])
+print(order)

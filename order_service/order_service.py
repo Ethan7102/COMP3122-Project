@@ -18,18 +18,18 @@ app = Flask(__name__)
 store = EventStore()
 
 
-def create_order(_product_ids, _customer_id):
+def create_order(_order_id, _order_state):
     """
     Create an order entity.
 
-    :param _product_ids: The product IDs the order is for.
-    :param _customer_id: The customer ID the order is made by.
+    :param _order_id: It is the order ID .
+    :param _order_state: It is the order state.
     :return: A dict with the entity properties.
     """
     return {
         'id': str(uuid.uuid4()),
-        'product_ids': _product_ids,
-        'customer_id': _customer_id
+        'order_id': _order_id,
+        'order_state': _order_state
     }
 
 
@@ -44,7 +44,7 @@ def connect_db():
 
 #@app.route('/orders', methods=['POST'])
 @app.route('/order', methods=['POST'])#receive a order 
-def create_order():
+def handle_order():
     db=connect_db()
     values = request.get_json()
     if db.hexists("orders", values["id"]):
@@ -77,11 +77,47 @@ def accept_order(order_id):
     db=connect_db()
     if db.hexists("orders", order_id):
         order = json.loads(db.hget("orders",order_id))
-        order["current_state"]="ACCEPTED"
-        db.hset("orders",order_id,json.dumps(order))
+        if order["current_state"]=="CREATED":
+            order["current_state"]="ACCEPTED"
+            db.hset("orders",order_id,json.dumps(order))
+            accept_order=create_order(order_id, order["current_state"])
+            store.publish('order', 'ACCEPTED', **accept_order)
+            return '',204
+        else:
+            return {"error":"The order state is "+order["current_state"]+". Only the order with order state CREATED can be accepted."},409
+    else:
+        return {"error": "not found"},404
 
 
-        
-        return '',204
+@app.route('/orders/<order_id>/deny_pos_order', methods=['POST'])#deny order
+def deny_order(order_id):
+    db=connect_db()
+    if db.hexists("orders", order_id):
+        order = json.loads(db.hget("orders",order_id))
+        if order["current_state"]=="CREATED":
+            order["current_state"]="DENIED"
+            db.hset("orders",order_id,json.dumps(order))
+            deny_order=create_order(order_id, order["current_state"])
+            #store.publish('order', 'ACCEPTED', **accept_order)
+            return '',204
+        else:
+            return {"error":"The order state is "+order["current_state"]+". Only the order with order state CREATED can be denied."},409
+    else:
+        return {"error": "not found"},404
+
+@app.route('/orders/<order_id>/cancel', methods=['POST'])#cancel order
+def cancel_order(order_id):
+    db=connect_db()
+    if db.hexists("orders", order_id):
+        order = json.loads(db.hget("orders",order_id))
+        if order["current_state"]!="DENIED" and order["current_state"]!="FINISHED" and order["current_state"]!="CANCELED":
+            order = json.loads(db.hget("orders",order_id))
+            order["current_state"]="CANCELED"
+            db.hset("orders",order_id,json.dumps(order))
+            cancel_order=create_order(order_id, order["current_state"])
+            #store.publish('order', 'ACCEPTED', **accept_order)
+            return '',204
+        else:
+            return {"error":"The order state is "+order["current_state"]+". It cannot be canceled."},409
     else:
         return {"error": "not found"},404

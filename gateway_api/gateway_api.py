@@ -51,6 +51,8 @@ def proxy_command_request(_base_url):
 @app.route('/order', methods=['POST'])
 @app.route('/order/<order_id>', methods=['GET'])
 @app.route('/orders/<order_id>/accept_pos_order', methods=['POST'])
+@app.route('/orders/<order_id>/deny_pos_order', methods=['POST'])
+@app.route('/orders/<order_id>/cancel', methods=['POST'])
 def order_command(order_id=None):
     return proxy_command_request('http://order-service:5000{}')
 
