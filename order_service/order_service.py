@@ -58,11 +58,9 @@ def accept_order(order_id):
     db=connect_db()
     if db.hexists("orders", order_id):
         order = json.loads(db.hget("orders",order_id))
-        if order["current_state"]=="CREATED":
+        if order["current_state"]=="CREATED" or order["current_state"]=="DENIED":
             order["current_state"]="ACCEPTED"
             db.hset("orders",order_id,json.dumps(order))
-            accept_order=create_order(order_id, order["current_state"])
-            store.publish('order', 'ACCEPTED', **accept_order)
             return '',204
         else:
             return {"error":"The order state is "+order["current_state"]+". Only the order with order state CREATED can be accepted."},409
@@ -75,10 +73,9 @@ def deny_order(order_id):
     db=connect_db()
     if db.hexists("orders", order_id):
         order = json.loads(db.hget("orders",order_id))
-        if order["current_state"]=="CREATED":
+        if order["current_state"]=="CREATED" or order["current_state"]=="ACCEPTED":
             order["current_state"]="DENIED"
             db.hset("orders",order_id,json.dumps(order))
-            deny_order=create_order(order_id, order["current_state"])
             #store.publish('order', 'ACCEPTED', **accept_order)
             return '',204
         else:
@@ -95,7 +92,6 @@ def cancel_order(order_id):
             order = json.loads(db.hget("orders",order_id))
             order["current_state"]="CANCELED"
             db.hset("orders",order_id,json.dumps(order))
-            cancel_order=create_order(order_id, order["current_state"])
             #store.publish('order', 'ACCEPTED', **accept_order)
             return '',204
         else:
@@ -105,24 +101,17 @@ def cancel_order(order_id):
 
 @app.route('/orders/<order_id>/restaurantdelivery/status', methods=['POST'])#accept order
 def update_delivery_status(order_id):
-    return {"Test":"Test"},200
-    # db=connect_db()
-
-    # if db.hexists("orders", order_id):
-
-        # try:
-        #     order = json.loads(db.hget("orders",order_id))
-        # except Exception as e:
-        #     return {"msg": e},200
-
-        #values = request.get_json()
-        # if values["status"]=="started" or values["status"]=="arriving" or values["status"]=="delivered":
-        #     order["deliveries"]["current_state"]=values["status"]
-        #     db.hset("orders",order_id,json.dumps(order))
-        #     return '',204
-        # else:
-        #     return {"error":"The order state is "+order["current_state"]+". Only the order with order state CREATED can be accepted."},409
-    # else:
-    #     return {"error": "not found"},404
+    db=connect_db()
+    if db.hexists("orders", order_id):
+        order = json.loads(db.hget("orders",order_id))
+        values = request.get_json()
+        if values["status"]=="started" or values["status"]=="arriving" or values["status"]=="delivered":
+            # order["deliveries"]["current_state"]=values["status"]
+            # db.hset("orders",order_id,json.dumps(order))
+            return '',204
+        else:
+            return {"error":"The order state is "+order["current_state"]+". Only the order with order state CREATED can be accepted."},409
+    else:
+        return {"error": "not found"},404
 
 
