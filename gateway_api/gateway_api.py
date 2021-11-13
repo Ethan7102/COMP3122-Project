@@ -33,13 +33,11 @@ def proxy_command_request(_base_url):
 
     # handle PUT
     if request.method == 'PUT':
-
-        try:
-            values = json.loads(request.data)
-        except Exception:
-            raise ValueError("cannot parse json body {}".format(request.data))
-        rsp = requests.put(_base_url.format(request.full_path), json=values)
-        return check_rsp_code(rsp)
+        rsp = requests.put(_base_url.format(request.full_path), json=json.loads(request.data))
+        if rsp.status_code==204:
+            return '',204
+        else:    
+            return rsp.json(), rsp.status_code
 
     # handle DELETE
     if request.method == 'DELETE':
@@ -66,6 +64,11 @@ def store_command(store_id=None):
 def order_command(order_id=None):
     return proxy_command_request('http://order-service:5000{}')
 
+@app.route('/<store_id>/menus', methods=['GET'])
+@app.route('/<store_id>/menus', methods=['PUT'])
+@app.route('/<store_id>/menus/items', methods=['POST'])
+def menu_command(store_id=None):
+    return proxy_command_request('http://menu-service:5000{}')
 
 
 

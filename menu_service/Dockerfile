@@ -2,9 +2,10 @@ ARG SERVICE_NAME
 
 FROM python:3
 
-RUN pip install flask
-RUN pip install redis
-RUN pip install requests
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
+
+COPY . .
 
 ENV SERVICE_NAME=menu_service
 

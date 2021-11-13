@@ -25,6 +25,19 @@ services:
     links:
       - redis-event-bus
       - redis-store-service
+      - redis-menu-service
+
+  menu-service:
+    image: menu-service
+    container_name: menu-service
+    build: menu_service
+    volumes:
+      - .:/app
+      - logvolume01:/var/log
+    links:
+      - redis-event-bus
+      - redis-order-service
+      - redis-store-service
 
   order-service:
     image: order-service
@@ -36,7 +49,7 @@ services:
     links:
       - redis-event-bus
       - redis-order-service
-
+      - redis-menu-service
 
   redis-event-bus:
     container_name: redis-event-bus
@@ -57,9 +70,11 @@ services:
     ports:
       - "6381:6379"
 
-
-
-
+  redis-menu-service:
+    container_name: redis-menu-service
+    image: redis
+    ports:
+      - "6382:6379"
 
 volumes:
   logvolume01: {}

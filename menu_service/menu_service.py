@@ -15,15 +15,15 @@ from lib.event_store import EventStore
 
 
 app = Flask(__name__)
-store = EventStore()
 
 
 def connect_db():
-    pool = redis.ConnectionPool(host='redis', port=6379, decode_responses=True)
+    pool = redis.ConnectionPool(host='redis-menu-service', port=6379, decode_responses=True)
     db = redis.Redis(connection_pool=pool)
     return db
 
-@app.route('/<store_id>/menus', methods=['PUT'])#receive a order 
+#Upload menu
+@app.route('/<store_id>/menus', methods=['PUT'])
 def upload_menu(store_id):
     db=connect_db()
     values = request.get_json()
@@ -32,18 +32,6 @@ def upload_menu(store_id):
         return values, 200
     except Exception as e:
         return {"message":str(e)},200
-
-
-# @app.route('/menus', methods=['GET'])
-# def get_all_menu():
-#     try:
-#         db=connect_db()
-#         return json.loads(db.hgetall("menus")), 200
-#         # return {"key": "value"}, 200
-#     except Exception as e:
-#         return {"message":str(e)},200
-#     # db=connect_db()
-#     # return json.loads(db.hgetall("menus")), 200
 
 @app.route('/<store_id>/menus', methods=['GET'])
 def get_menu(store_id):
