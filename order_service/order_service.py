@@ -15,32 +15,13 @@ from lib.event_store import EventStore
 
 
 app = Flask(__name__)
-store = EventStore()
 
-
-def create_order(_order_id, _order_state):
-    """
-    Create an order entity.
-
-    :param _order_id: It is the order ID .
-    :param _order_state: It is the order state.
-    :return: A dict with the entity properties.
-    """
-    return {
-        'id': str(uuid.uuid4()),
-        'order_id': _order_id,
-        'order_state': _order_state
-    }
-
-
-if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-    store.activate_entity_cache('order')
-    atexit.register(store.deactivate_entity_cache, 'order')
 
 def connect_db():
-    pool = redis.ConnectionPool(host='redis', port=6379, decode_responses=True)
+    pool = redis.ConnectionPool(host='redis-order-service', port=6379, decode_responses=True)
     db = redis.Redis(connection_pool=pool)
     return db
+
 
 #@app.route('/orders', methods=['POST'])
 @app.route('/order', methods=['POST'])#receive a order 
@@ -121,3 +102,27 @@ def cancel_order(order_id):
             return {"error":"The order state is "+order["current_state"]+". It cannot be canceled."},409
     else:
         return {"error": "not found"},404
+
+@app.route('/orders/<order_id>/restaurantdelivery/status', methods=['POST'])#accept order
+def update_delivery_status(order_id):
+    return {"Test":"Test"},200
+    # db=connect_db()
+
+    # if db.hexists("orders", order_id):
+
+        # try:
+        #     order = json.loads(db.hget("orders",order_id))
+        # except Exception as e:
+        #     return {"msg": e},200
+
+        #values = request.get_json()
+        # if values["status"]=="started" or values["status"]=="arriving" or values["status"]=="delivered":
+        #     order["deliveries"]["current_state"]=values["status"]
+        #     db.hset("orders",order_id,json.dumps(order))
+        #     return '',204
+        # else:
+        #     return {"error":"The order state is "+order["current_state"]+". Only the order with order state CREATED can be accepted."},409
+    # else:
+    #     return {"error": "not found"},404
+
+

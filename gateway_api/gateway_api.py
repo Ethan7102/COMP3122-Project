@@ -6,11 +6,10 @@ from flask import request
 from flask import Flask
 
 from common.utils import check_rsp_code
-from lib.event_store import EventStore
+
 
 
 app = Flask(__name__)
-store = EventStore()
 
 
 def proxy_command_request(_base_url):
@@ -48,11 +47,27 @@ def proxy_command_request(_base_url):
         return check_rsp_code(rsp)
 
 
+@app.route('/stores', methods=['GET'])
+@app.route('/store/<store_id>', methods=['GET'])
+@app.route('/store/<store_id>/status', methods=['GET'])
+@app.route('/store/<store_id>/setStatus', methods=['POST', 'GET'])
+@app.route('/store/<store_id>/holiday-hours', methods=['GET'])
+@app.route('/store/<store_id>/setHoliday-hours', methods=['POST', 'GET'])
+def store_command(store_id=None):
+    return proxy_command_request('http://store-service:5000{}')
+
+
 @app.route('/order', methods=['POST'])
 @app.route('/order/<order_id>', methods=['GET'])
 @app.route('/orders/<order_id>/accept_pos_order', methods=['POST'])
 @app.route('/orders/<order_id>/deny_pos_order', methods=['POST'])
 @app.route('/orders/<order_id>/cancel', methods=['POST'])
+@app.route('/orders/<order_id>/restaurantdelivery/status', methods=['POST'])
 def order_command(order_id=None):
     return proxy_command_request('http://order-service:5000{}')
+
+
+
+
+
 

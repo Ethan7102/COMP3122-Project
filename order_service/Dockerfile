@@ -2,9 +2,12 @@ ARG SERVICE_NAME
 
 FROM python:3
 
-RUN pip install flask
-RUN pip install redis
-RUN pip install requests
+
+RUN pip install flask==2.0.2
+RUN pip install redis==3.5.3
+RUN pip install requests==2.26.0
+
+COPY . .
 
 ENV SERVICE_NAME=order_service
 
