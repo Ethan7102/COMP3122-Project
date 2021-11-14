@@ -4,19 +4,26 @@ import os
 import re
 import requests
 import uuid
-import time
 import redis
 import uuid
 import secrets
 
 from flask import request
 from flask import Flask, jsonify
-
+from flask import Response
+import prometheus_client
+from prometheus_client.core import CollectorRegistry
+from prometheus_client import Summary, Counter, Histogram, Gauge
+import time
 from common.utils import check_rsp_code
 from lib.event_store import EventStore
 
 app = Flask(__name__)
+_INF = float("inf")
 
+graphs = {}
+graphs['c'] = Counter('python_request_operations_total', 'The total number of processed requests')
+graphs['h'] = Histogram('python_request_duration_seconds', 'Histogram for the duration in seconds.', buckets=(1, 2, 5, 6, 10, _INF))
 initialization = 1
 
 def initialize():

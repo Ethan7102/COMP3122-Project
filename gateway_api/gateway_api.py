@@ -116,6 +116,11 @@ def store_metrics():
     rsp = requests.get("http://store-service:5000/store-metrics")
     return rsp.text,rsp.status_code
 
+@app.route("/order-metrics",methods=['GET'])
+def order_metrics():
+    rsp = requests.get("http://order-service:5000/order-metrics")
+    return rsp.text,rsp.status_code
+
 
 @app.route('/authentication/get_token', methods=['POST'])
 def authentication_command():

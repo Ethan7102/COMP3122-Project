@@ -124,6 +124,7 @@ services:
       - '9090:9090'
     expose:
       - 9090
+
       
   #grafana
   grafana:
@@ -135,7 +136,7 @@ services:
       - GF_SECURITY_ADMIN_USER=comp3122
       - GF_SECURITY_ADMIN_PASSWORD=12345
     depends_on:
-      - nodeExporter
+      - prometheus
     ports:
       - '3000:3000'
 

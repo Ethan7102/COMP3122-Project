@@ -2,7 +2,7 @@ ARG SERVICE_NAME
 
 FROM python:3.11.0a1-alpine3.14
 
-
+RUN pip install prometheus_client==0.12.0
 RUN pip install flask==2.0.2
 RUN pip install redis==3.5.3
 RUN pip install requests==2.26.0
