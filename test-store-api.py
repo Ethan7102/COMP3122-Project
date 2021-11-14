@@ -21,7 +21,9 @@ holiday_hours={ "holiday_hours": { "2019-12-10": { "open_time_periods": [ { "sta
 db.hset("holidayHours", "7e973b58-40b7-4bd8-b01c-c7d1cbd194f6",json.dumps(holiday_hours))
 
 
-
+# get token
+response = requests.post('http://localhost:5000/authentication/get_token', json={"username":"comp3122", "password": "comp3122"})
+token = {"authorization": response.json()['token']}
 
 
 #print(db.hget("stores", "7e973b58-40b7-4bd8-b01c-c7d1cbd194f6"))
@@ -36,11 +38,11 @@ db.hset("holidayHours", "7e973b58-40b7-4bd8-b01c-c7d1cbd194f6",json.dumps(holida
 #List All Stores
 #@app.route("/stores")
 def test_store_list_5000_check_status_code_equals_200():
-    response = requests.get("http://localhost:5000/stores")
+    response = requests.get("http://localhost:5000/stores", headers=token)
     assert response.status_code == 200
 
 def test_store_list_5000_check_return_json():
-    response = requests.get("http://localhost:5000/stores")
+    response = requests.get("http://localhost:5000/stores", headers=token)
     data = db.hgetall('stores')
     json_data = json.dumps(data)
     json_without_slash = json.loads(json_data)
@@ -54,11 +56,11 @@ def test_store_list_5000_check_return_json():
 store_id = "7e973b58-40b7-4bd8-b01c-c7d1cbd194f6"
 
 def test_store_id_5000_check_status_code_equals_200():
-    response = requests.get("http://localhost:5000/store/"+ store_id)
+    response = requests.get("http://localhost:5000/store/"+ store_id, headers=token)
     assert response.status_code == 200
 
 def test_store_id_5000_check_return_json():
-    response = requests.get("http://localhost:5000/store/"+ store_id)
+    response = requests.get("http://localhost:5000/store/"+ store_id, headers=token)
 
 
     assert response.json() == json.loads(db.hget("stores",store_id))
@@ -70,11 +72,11 @@ def test_store_id_5000_check_return_json():
 #get store status with specific store id
 #@app.route('/store/<store_id>/status')
 def test_get_status_5000_check_status_code_equals_200():
-    response = requests.get("http://localhost:5000/store/"+ store_id+ "/status")
+    response = requests.get("http://localhost:5000/store/"+ store_id+ "/status", headers=token)
     assert response.status_code == 200
 
 def test_get_status_5000_check_return_json():
-    response = requests.get("http://localhost:5000/store/"+ store_id + "/status")
+    response = requests.get("http://localhost:5000/store/"+ store_id + "/status", headers=token)
     json_data = json.loads(db.hget("stores","7e973b58-40b7-4bd8-b01c-c7d1cbd194f6"))
     result = '{ "status" : ' + '"'+ json_data["status"] +'"' + ',' + '"offlineReason"'+' : ' +  '"N/A"' +'}'
     assert response.json() == result
@@ -88,12 +90,12 @@ def test_set_status_5000_check_status_code_equals_200():
 
     newStatus = "PAUSED"
     reason = 'NA'
-    response = requests.get("http://localhost:5000/store/" +store_id+ "/setStatus?newStatus="+newStatus+"&reason="+reason)
+    response = requests.get("http://localhost:5000/store/" +store_id+ "/setStatus?newStatus="+newStatus+"&reason="+reason, headers=token)
 
     assert response.status_code == 200
 
 def test_set_status_5000_check_return_json():
-    response = requests.get("http://localhost:5000/store/" +store_id+ "/status")
+    response = requests.get("http://localhost:5000/store/" +store_id+ "/status", headers=token)
     result = '{ "status" : ' + '"'+ '"PAUSED"' +'"' + ',' + '"offlineReason"'+' : ' +  '"NA"' +'}'
     
     assert response.json() == result
@@ -102,11 +104,11 @@ def test_set_status_5000_check_return_json():
 #get store holiday-hours with specific store id
 #@app.route('/store/<store_id>/holiday-hours')
 def test_get_holiday_hours_5000_check_status_code_equals_200():
-    response = requests.get("http://localhost:5000/store/" +store_id+ "/holiday-hours")
+    response = requests.get("http://localhost:5000/store/" +store_id+ "/holiday-hours", headers=token)
     assert response.status_code == 200
 
 def test_get_status_5000_check_return_json():
-    response = requests.get("http://localhost:5000/store/" +store_id+ "/holiday-hours")
+    response = requests.get("http://localhost:5000/store/" +store_id+ "/holiday-hours", headers=token)
     json_data = json.loads(db.hget("holidayHours",store_id))
 
     assert response.json() == json_data
@@ -118,14 +120,14 @@ def test_get_status_5000_check_return_json():
 def test_set_holiday_hours_5000_check_status_code_equals_200():
 
 
-    response = requests.get("http://localhost:5000/store/" +store_id+ "/setHoliday-hours?jsonInputString=%7B%20%22holiday_hours%22%3A%20%7B%20%222020-12-24%22%3A%20%7B%20%22open_time_periods%22%3A%20%5B%20%7B%20%22start_time%22%3A%20%2200%3A00%22%2C%20%22end_time%22%3A%20%2200%3A00%22%20%7D%20%5D%20%7D%20%7D%20%7D")
+    response = requests.get("http://localhost:5000/store/" +store_id+ "/setHoliday-hours?jsonInputString=%7B%20%22holiday_hours%22%3A%20%7B%20%222020-12-24%22%3A%20%7B%20%22open_time_periods%22%3A%20%5B%20%7B%20%22start_time%22%3A%20%2200%3A00%22%2C%20%22end_time%22%3A%20%2200%3A00%22%20%7D%20%5D%20%7D%20%7D%20%7D", headers=token)
 
     assert response.status_code == 200
 
 def test_set_status_5000_check_return_json():
 
 
-    response = requests.get("http://localhost:5000/store/" +store_id+ "/holiday-hours")
+    response = requests.get("http://localhost:5000/store/" +store_id+ "/holiday-hours", headers=token)
     json_data = json.loads(db.hget("holidayHours",store_id))
 
 
