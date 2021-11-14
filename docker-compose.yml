@@ -110,6 +110,23 @@ services:
 
     expose:
       - 9100
+      
+  #grafana
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards/
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources/
+    environment:
+      - GF_SECURITY_ADMIN_USER=comp3122
+      - GF_SECURITY_ADMIN_PASSWORD=12345
+    depends_on:
+      - prometheus
+    ports:
+      - '3000:3000'
+
+    expose:
+      - 3000
 
 volumes:
   logvolume01: {}
