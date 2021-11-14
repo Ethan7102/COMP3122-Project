@@ -34,8 +34,11 @@ def connect_db():
     return db
 
 
-@app.route('/order', methods=['POST'])#receive a order 
+@app.route('/order', methods=['POST'])#receive a order
 def handle_order():
+    start = time.time()
+    end = time.time()
+    graphs['c'].inc()
     db=connect_db()
     values = request.get_json()
     if db.hexists("orders", values["id"]):
@@ -51,7 +54,7 @@ def handle_order():
             rsp = requests.post(webhook_url, json=values)
             status_code=rsp.status_code
             time+=1
-        
+
         db.hset("orders",values["id"],json.dumps(values))
         return {"message":"order is created"}, 200
 
@@ -86,7 +89,7 @@ def get_created_orders(store_id):
     orders_keys=db.hkeys("orders")
     created_orders= {"orders":[]}
     count=0
-    for orders_key in orders_keys:    
+    for orders_key in orders_keys:
         order = json.loads(db.hget("orders",orders_key))
         if order["current_state"] == "CREATED" and order["store"]["id"] == store_id:
             created_orders["orders"].append({"id":orders_key, "current_state":order["current_state"], "placed_at":order["placed_at"]})
@@ -101,7 +104,7 @@ def get_canceled_orders(store_id):
     db=connect_db()
     orders_keys=db.hkeys("orders")
     canceled_orders= {"orders":[]}
-    for orders_key in orders_keys:    
+    for orders_key in orders_keys:
         order = json.loads(db.hget("orders",orders_key))
         if order["current_state"] == "CANCELED" and order["store"]["id"] == store_id:
             canceled_orders["orders"].append({"id":orders_key, "current_state":order["current_state"], "placed_at":order["placed_at"]})
@@ -171,5 +174,3 @@ def update_delivery_status(order_id):
             return {"error":"The order state is "+order["current_state"]+". It cannot be updated the delivery status."},409
     else:
         return {"error": "not found"},404
-
-

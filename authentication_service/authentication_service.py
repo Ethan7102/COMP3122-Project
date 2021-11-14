@@ -3,7 +3,6 @@ import json
 import os
 import re
 import requests
-import uuid
 import redis
 import uuid
 import secrets
@@ -15,22 +14,24 @@ import prometheus_client
 from prometheus_client.core import CollectorRegistry
 from prometheus_client import Summary, Counter, Histogram, Gauge
 import time
-from common.utils import check_rsp_code
 from lib.event_store import EventStore
 
 app = Flask(__name__)
 _INF = float("inf")
 
 graphs = {}
-graphs['c'] = Counter('python_request_operations_total', 'The total number of processed requests')
-graphs['h'] = Histogram('python_request_duration_seconds', 'Histogram for the duration in seconds.', buckets=(1, 2, 5, 6, 10, _INF))
+graphs['c'] = Counter('python_request_operations_total',
+                      'The total number of processed requests')
+graphs['h'] = Histogram('python_request_duration_seconds',
+                        'Histogram for the duration in seconds.', buckets=(1, 2, 5, 6, 10, _INF))
 initialization = 1
+
 
 def initialize():
     db = connect_db()
     db.hset("user", "comp3122", "comp3122")
     initialization = 0
-    #set a token for testing
+    # set a token for testing
     db.hset("tokens", "test", "740becc4b623786cc812c956a5afb30e")
 
 
@@ -56,7 +57,7 @@ def get_token():
             db.hset("tokens", values["username"], token)
             end = time.time()
             graphs['h'].observe(end - start)
-            return {"Your token": token}, 200
+            return {"token": token}, 200
     end = time.time()
     graphs['h'].observe(end - start)
     return {"error": "username or password is incorrect."}, 400
