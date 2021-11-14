@@ -49,7 +49,6 @@ services:
     links:
       - redis-event-bus
       - redis-order-service
-      - redis-menu-service
 
   redis-event-bus:
     container_name: redis-event-bus

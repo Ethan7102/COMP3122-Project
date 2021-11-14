@@ -6,6 +6,7 @@ import requests
 import uuid
 import time
 import redis
+import uuid
 
 from flask import request
 from flask import Flask, jsonify
@@ -104,13 +105,17 @@ def update_delivery_status(order_id):
     db=connect_db()
     if db.hexists("orders", order_id):
         order = json.loads(db.hget("orders",order_id))
-        values = request.get_json()
-        if values["status"]=="started" or values["status"]=="arriving" or values["status"]=="delivered":
-            # order["deliveries"]["current_state"]=values["status"]
-            # db.hset("orders",order_id,json.dumps(order))
-            return '',204
+        if order["current_state"]=="ACCEPTED":
+            values = request.get_json()
+            if values["status"]=="started" or values["status"]=="arriving" or values["status"]=="delivered":
+                delivery={"id":str(uuid.uuid4()), "current_state":values["status"].upper()}
+                order["deliveries"].append(delivery)
+                db.hset("orders",order_id,json.dumps(order))
+                return '',204
+            else:
+                return {"error":"The delivery status '"+values["status"]+"' is not accepted. Allowed values: started, arriving, delivered"},400
         else:
-            return {"error":"The order state is "+order["current_state"]+". Only the order with order state CREATED can be accepted."},409
+            return {"error":"The order state is "+order["current_state"]+". It cannot be updated the delivery status."},409
     else:
         return {"error": "not found"},404
 
