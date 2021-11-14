@@ -15,10 +15,9 @@ from flask import Flask, jsonify
 from common.utils import check_rsp_code
 from lib.event_store import EventStore
 
-initialization = 1
-
 app = Flask(__name__)
 
+initialization = 1
 
 def initialize():
     db = connect_db()
