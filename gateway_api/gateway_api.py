@@ -85,7 +85,7 @@ def store_command(store_id=None):
     if authenticating_by_token(get_token()):
         return proxy_command_request('http://store-service:5000{}')
     else:
-        return {"error": "permission denied. your token is incorrect miss. if you don't have it, please register a token by http://localhost:5000/authentication/get_token."}, 200
+        return {"error": "permission denied. your token is incorrect miss. if you don't have it, please register a token by http://localhost:5000/authentication/get_token."}, 403
 
 @app.route('/order', methods=['POST'])
 @app.route('/order/<order_id>', methods=['GET'])
@@ -99,7 +99,7 @@ def order_command(order_id=None, store_id=None):
     if authenticating_by_token(get_token()):
         return proxy_command_request('http://order-service:5000{}')
     else:
-        return {"error": "permission denied. your token is incorrect miss. if you don't have it, please register a token by http://localhost:5000/authentication/get_token."}, 200
+        return {"error": "permission denied. your token is incorrect miss. if you don't have it, please register a token by http://localhost:5000/authentication/get_token."}, 403
 
 
 @app.route('/<store_id>/menus', methods=['GET'])
@@ -109,7 +109,7 @@ def menu_command(store_id=None):
     if authenticating_by_token(get_token()):
         return proxy_command_request('http://menu-service:5000{}')
     else:
-        return {"error": "permission denied. your token is incorrect miss. if you don't have it, please register a token by http://localhost:5000/authentication/get_token."}, 200
+        return {"error": "permission denied. your token is incorrect miss. if you don't have it, please register a token by http://localhost:5000/authentication/get_token."}, 403
 
 @app.route('/menu-metrics', methods=['GET'])
 def menu_metrics():
