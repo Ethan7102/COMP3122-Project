@@ -13,6 +13,8 @@ services:
     links:
       - redis-event-bus
 
+      
+
   store-service:
     image: store-service
     container_name: store-service
@@ -48,24 +50,12 @@ services:
       - redis-event-bus
       - redis-order-service
 
-  authentication-service:
-    image: authentication-service
-    container_name: authentication-service
-    build: authentication_service
-    depends_on:
-      - "redis-authentication-service"
-    volumes:
-      - .:/app
-      - logvolume01:/var/log
-    links:
-      - redis-event-bus
-      - redis-authentication-service
-
   redis-event-bus:
     container_name: redis-event-bus
     image: redis
     ports:
       - "6379:6379"
+
 
   redis-order-service:
     container_name: redis-order-service
@@ -84,12 +74,6 @@ services:
     image: redis
     ports:
       - "6382:6379"
-  
-  redis-authentication-service:
-    container_name: redis-authentication-service
-    image: redis
-    ports:
-      - "6383:6379"
 
 volumes:
   logvolume01: {}
