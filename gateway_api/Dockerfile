@@ -5,9 +5,6 @@ FROM python:3
 RUN pip install flask
 RUN pip install redis
 RUN pip install requests
-# RUN python3 ./initialize.py
-# RUN redis-cli
-# RUN HMSET user comp3122 "comp3122"
 
 ENV SERVICE_NAME=gateway_api
 
@@ -19,6 +16,4 @@ ENV PYTHONPATH /app
 
 EXPOSE 5000
 
-# ADD initialize.py /
-# RUN [ "python", "./initialize.py"]
 CMD [ "flask", "run", "--host=0.0.0.0" ]
