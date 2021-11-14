@@ -84,5 +84,4 @@ def store_metrics():
 
 @app.route('/authentication/get_token', methods=['POST'])
 def authentication_command():
-    return '',204
     return proxy_command_request('http://authentication-service:5000{}')
