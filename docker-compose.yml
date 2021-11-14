@@ -47,6 +47,19 @@ services:
     links:
       - redis-event-bus
       - redis-order-service
+      
+  authentication-service:
+    image: authentication-service
+    container_name: authentication-service
+    build:
+      context: ./authentication_service
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - logvolume01:/var/log
+    links:
+      - redis-event-bus
+      - redis-authentication-service
 
   redis-event-bus:
     container_name: redis-event-bus
@@ -72,9 +85,14 @@ services:
     ports:
       - "6382:6379"
 
+  redis-authentication-service:
+    container_name: redis-authentication-service
+    image: redis
+    ports:
+      - "6383:6379"
+
 volumes:
   logvolume01: {}
 networks:
   default:
     name: comp3122-project
-#sadas
