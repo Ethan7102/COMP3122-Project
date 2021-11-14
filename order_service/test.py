@@ -1,6 +1,8 @@
 import json, uuid, redis
+import re
 from flask import jsonify 
 from datetime import datetime
+import requests
 # data = '{"test":[{"1":"2","3":"4"}],"test2":"3"}'
 # data = json.loads(data)
 # print(data["test"][0])
@@ -28,10 +30,14 @@ from datetime import datetime
 # # yyyy-mm-dd'T'HH:mm:ss
 
 
-pool = redis.ConnectionPool(
-host='localhost', port=6383, decode_responses=True)
-token = '740becc4b623786cc812c956a5afb30e'
-db = redis.Redis(connection_pool=pool)
-tokens = db.hvals('tokens')
-if token in tokens:
-    print(tokens)
+# pool = redis.ConnectionPool(
+# host='localhost', port=6383, decode_responses=True)
+# token = '740becc4b623786cc812c956a5afb30e'
+# db = redis.Redis(connection_pool=pool)
+# tokens = db.hvals('tokens')
+# if token in tokens:
+#     print(tokens)
+
+response = requests.post('http://localhost:5000/authentication/get_token', json={"username":"comp3122", "password": "comp3122"})
+token = response.json()
+print(token)
