@@ -57,11 +57,13 @@ def store_command(store_id=None):
 
 @app.route('/order', methods=['POST'])
 @app.route('/order/<order_id>', methods=['GET'])
+@app.route('/stores/<store_id>/created-orders', methods=['GET'])
+@app.route('/stores/<store_id>/canceled-orders', methods=['GET'])
 @app.route('/orders/<order_id>/accept_pos_order', methods=['POST'])
 @app.route('/orders/<order_id>/deny_pos_order', methods=['POST'])
 @app.route('/orders/<order_id>/cancel', methods=['POST'])
 @app.route('/orders/<order_id>/restaurantdelivery/status', methods=['POST'])
-def order_command(order_id=None):
+def order_command(order_id=None, store_id=None):
     return proxy_command_request('http://order-service:5000{}')
 
 @app.route('/<store_id>/menus', methods=['GET'])

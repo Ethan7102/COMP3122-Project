@@ -8,6 +8,16 @@ curl -X POST -v http://localhost:5000/order -H 'Content-Type: application/json' 
 curl -v http://localhost:5000/order/f9f363d1-e1c2-4595-b477-c649845bc953
 ```
 
+* /stores/<store_id>/created-orders
+```
+curl -v http://localhost:5000/stores/c7f1dc2f-fabe-4997-845c-cad26fdcb894/created-orders
+```
+
+* /stores/<store_id>/canceled-orders
+```
+curl -v http://localhost:5000/stores/c7f1dc2f-fabe-4997-845c-cad26fdcb894/canceled-orders
+```
+
 * /orders/<order_id>/accept_pos_order: accept an order
 ```
 curl -X POST -v http://localhost:5000/orders/f9f363d1-e1c2-4595-b477-c649845bc953/accept_pos_order -H 'Content-Type: application/json' -d '{"reason": "accepted"}'

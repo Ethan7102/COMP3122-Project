@@ -54,6 +54,28 @@ def get_order(order_id):
     else:
         return {"error": "not found"},404
 
+@app.route('/stores/<store_id>/created-orders', methods=['GET']) # get orders of a specific store with status "CREATED"
+def get_created_orders(store_id):
+    db=connect_db()
+    orders_keys=db.hkeys("orders")
+    created_orders= {"orders":[]}
+    for orders_key in orders_keys:    
+        order = json.loads(db.hget("orders",orders_key))
+        if order["current_state"] == "CREATED" and order["store"]["id"] == store_id:
+            created_orders["orders"].append({"id":orders_key, "current_state":order["current_state"], "placed_at":order["placed_at"]})
+    return created_orders,200
+
+@app.route('/stores/<store_id>/canceled-orders', methods=['GET']) # get orders of a specific store with status "CREATED"
+def get_canceled_orders(store_id):
+    db=connect_db()
+    orders_keys=db.hkeys("orders")
+    canceled_orders= {"orders":[]}
+    for orders_key in orders_keys:    
+        order = json.loads(db.hget("orders",orders_key))
+        if order["current_state"] == "CANCELED" and order["store"]["id"] == store_id:
+            canceled_orders["orders"].append({"id":orders_key, "current_state":order["current_state"], "placed_at":order["placed_at"]})
+    return canceled_orders,200
+
 @app.route('/orders/<order_id>/accept_pos_order', methods=['POST'])#accept order
 def accept_order(order_id):
     db=connect_db()
@@ -100,7 +122,7 @@ def cancel_order(order_id):
     else:
         return {"error": "not found"},404
 
-@app.route('/orders/<order_id>/restaurantdelivery/status', methods=['POST'])#accept order
+@app.route('/orders/<order_id>/restaurantdelivery/status', methods=['POST'])#update delivery status of an order
 def update_delivery_status(order_id):
     db=connect_db()
     if db.hexists("orders", order_id):
