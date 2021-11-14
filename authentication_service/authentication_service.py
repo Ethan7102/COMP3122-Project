@@ -22,15 +22,18 @@ app = Flask(__name__)
 _INF = float("inf")
 
 graphs = {}
-graphs['c'] = Counter('python_request_operations_total', 'The total number of processed requests')
-graphs['h'] = Histogram('python_request_duration_seconds', 'Histogram for the duration in seconds.', buckets=(1, 2, 5, 6, 10, _INF))
+graphs['c'] = Counter('python_request_operations_total',
+                      'The total number of processed requests')
+graphs['h'] = Histogram('python_request_duration_seconds',
+                        'Histogram for the duration in seconds.', buckets=(1, 2, 5, 6, 10, _INF))
 initialization = 1
+
 
 def initialize():
     db = connect_db()
     db.hset("user", "comp3122", "comp3122")
     initialization = 0
-    #set a token for testing
+    # set a token for testing
     db.hset("tokens", "test", "740becc4b623786cc812c956a5afb30e")
 
 

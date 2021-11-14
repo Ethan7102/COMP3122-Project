@@ -41,3 +41,4 @@ import requests
 response = requests.post('http://localhost:5000/authentication/get_token', json={"username":"comp3122", "password": "comp3122"})
 token = response.json()
 print(token)
+data = {"authorization": token}
