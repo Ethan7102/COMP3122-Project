@@ -1,4 +1,5 @@
 import json
+from os import terminal_size
 
 import requests
 import redis
@@ -8,10 +9,9 @@ from flask import Flask
 
 from common.utils import check_rsp_code
 
-
+initialization = 1
 
 app = Flask(__name__)
-
 
 def proxy_command_request(_base_url):
     """
@@ -45,15 +45,35 @@ def proxy_command_request(_base_url):
         rsp = requests.delete(_base_url.format(request.full_path))
         return check_rsp_code(rsp)
 
+
+def initialize():
+    pool = redis.ConnectionPool(host='redis-authentication-service', port=6379, decode_responses=True)
+    db = redis.Redis(connection_pool=pool)
+    db.hset("user", "comp3122", "comp3122")
+    initialization = 0
+    #set a token for testing
+    db.hset("tokens", "test", "740becc4b623786cc812c956a5afb30e")
+
+
 def authenticating_by_token(token):
-    pool = redis.ConnectionPool(
-    host='redis-authentication-service', port=6379, decode_responses=True)
+    if token is None:
+        return False
+    if initialization:
+        initialize()
+    pool = redis.ConnectionPool(host='redis-authentication-service', port=6379, decode_responses=True)
     db = redis.Redis(connection_pool=pool)
     tokens = db.hvals('tokens')
     if token in tokens:
         return True
     else:
         return False
+
+def get_token():
+    try:
+        token = request.headers['authorization']
+    except:
+        token = None
+    return token
 
 @app.route('/stores', methods=['GET'])
 @app.route('/store/<store_id>', methods=['GET'])
@@ -74,7 +94,11 @@ def store_command(store_id=None):
 @app.route('/orders/<order_id>/cancel', methods=['POST'])
 @app.route('/orders/<order_id>/restaurantdelivery/status', methods=['POST'])
 def order_command(order_id=None, store_id=None):
-    return proxy_command_request('http://order-service:5000{}')
+    if authenticating_by_token(get_token()):
+        return proxy_command_request('http://order-service:5000{}')
+    else:
+        return {"error": "permission denied. your token is incorrect miss. if you don't have it, please register a token by http://localhost:5000/authentication/get_token."}, 200
+
 
 @app.route('/<store_id>/menus', methods=['GET'])
 @app.route('/<store_id>/menus', methods=['PUT'])
