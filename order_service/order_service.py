@@ -14,7 +14,6 @@ from flask import Flask, jsonify
 from common.utils import check_rsp_code
 from lib.event_store import EventStore
 
-
 app = Flask(__name__)
 
 

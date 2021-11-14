@@ -2,12 +2,14 @@ ARG SERVICE_NAME
 
 FROM python:3
 
-RUN pip install flask
-RUN pip install redis
-RUN pip install requests
-RUN python3 ./initialize.py
 
-ENV SERVICE_NAME=gateway_api
+RUN pip install flask==2.0.2
+RUN pip install redis==3.5.3
+RUN pip install requests==2.26.0
+
+COPY . .
+
+ENV SERVICE_NAME=authentication_service
 
 RUN mkdir -p /app
 
@@ -16,5 +18,5 @@ ENV FLASK_APP /app/${SERVICE_NAME}/${SERVICE_NAME}.py
 ENV PYTHONPATH /app
 
 EXPOSE 5000
-COPY initialize.py ./
+
 CMD [ "flask", "run", "--host=0.0.0.0" ]

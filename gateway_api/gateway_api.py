@@ -72,6 +72,10 @@ def order_command(order_id=None, store_id=None):
 def menu_command(store_id=None):
     return proxy_command_request('http://menu-service:5000{}')
 
+@app.route('/authentication/get_token', methods=['POST'])
+def authentication_command():
+    return proxy_command_request('http://authentication-service:5000{}')
+
 
 
 
