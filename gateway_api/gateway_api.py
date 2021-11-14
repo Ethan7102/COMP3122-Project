@@ -125,3 +125,8 @@ def order_metrics():
 @app.route('/authentication/get_token', methods=['POST'])
 def authentication_command():
     return proxy_command_request('http://authentication-service:5000{}')
+
+@app.route("/authentication-metrics",methods=['GET'])
+def authentication_metrics():
+    rsp = requests.get("http://authentication-service:5000/authentication-metrics")
+    return rsp.text,rsp.status_code
