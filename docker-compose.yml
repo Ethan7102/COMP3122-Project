@@ -13,8 +13,6 @@ services:
     links:
       - redis-event-bus
 
-      
-
   store-service:
     image: store-service
     container_name: store-service
@@ -55,7 +53,6 @@ services:
     image: redis
     ports:
       - "6379:6379"
-
 
   redis-order-service:
     container_name: redis-order-service
