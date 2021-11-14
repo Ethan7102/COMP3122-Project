@@ -21,20 +21,16 @@ app = Flask(__name__)
 
 _INF = float("inf")
 
+#making metrics
 graphs = {}
 graphs['c'] = Counter('python_request_operations_total', 'The total number of processed requests')
 graphs['h'] = Histogram('python_request_duration_seconds', 'Histogram for the duration in seconds.', buckets=(1, 2, 5, 6, 10, _INF))
 
-class JSONResponse(Response):
-    default_mimetype = 'application/json'
 
-    @classmethod
-    def force_type(cls,response,environ=None):
-        if isinstance(response,dict):
-            response = jsonify(response)
-        return super(JSONResponse,cls).force_type(response,environ)
 
-app.response_class = JSONResponse
+#connect to the event bus
+r = redis.Redis(host='redis-event-bus', port=6379, db=0)
+
 
 
 
@@ -151,6 +147,14 @@ def set_status(store_id):
     graphs['c'].inc()
 
     newStatus = request.args.get('newStatus')
+
+    #use event bus to publish that store is not active anymore
+    if( newStatus != "active"):
+
+        r.publish('store_not_available_channel', store_id
+
+    )
+
 
     #why edit the status
     reason = request.args.get('reason')
