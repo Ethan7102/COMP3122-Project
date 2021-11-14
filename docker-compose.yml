@@ -110,7 +110,19 @@ services:
 
     expose:
       - 9100
-      
+
+  #prometheus
+  prometheus:
+    image: prom/prometheus:v2.30.3
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+    ports:
+      - '9090:9090'
+    expose:
+      - 9090
+
   #grafana
   grafana:
     image: grafana/grafana
