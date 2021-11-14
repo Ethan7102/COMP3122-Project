@@ -28,3 +28,10 @@ from datetime import datetime
 # # yyyy-mm-dd'T'HH:mm:ss
 
 
+pool = redis.ConnectionPool(
+host='localhost', port=6383, decode_responses=True)
+token = '740becc4b623786cc812c956a5afb30e'
+db = redis.Redis(connection_pool=pool)
+tokens = db.hvals('tokens')
+if token in tokens:
+    print(tokens)

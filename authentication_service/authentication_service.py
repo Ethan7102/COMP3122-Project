@@ -24,6 +24,8 @@ def initialize():
     db = connect_db()
     db.hset("user", "comp3122", "comp3122")
     initialization = 0
+    #set a token for testing
+    db.hset("tokens", "test", "740becc4b623786cc812c956a5afb30e")
 
 
 def connect_db():
@@ -43,6 +45,6 @@ def get_token():
         password = db.hget("user", values["username"])
         if password == values["password"]:
             token = secrets.token_hex(16)
-            db.hset("token", values["username"], token)
+            db.hset("tokens", values["username"], token)
             return {"Your token": token}, 200
     return {"error": "username or password is incorrect."}, 400
