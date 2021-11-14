@@ -3,7 +3,6 @@ import json
 import os
 import re
 import requests
-import uuid
 import redis
 import uuid
 import secrets
@@ -15,7 +14,6 @@ import prometheus_client
 from prometheus_client.core import CollectorRegistry
 from prometheus_client import Summary, Counter, Histogram, Gauge
 import time
-from common.utils import check_rsp_code
 from lib.event_store import EventStore
 
 app = Flask(__name__)
@@ -59,7 +57,7 @@ def get_token():
             db.hset("tokens", values["username"], token)
             end = time.time()
             graphs['h'].observe(end - start)
-            return {"Your token": token}, 200
+            return {"token": token}, 200
     end = time.time()
     graphs['h'].observe(end - start)
     return {"error": "username or password is incorrect."}, 400

@@ -32,6 +32,7 @@ def connect_db():
 @app.route('/order', methods=['POST'])#receive a order 
 def handle_order():
     start = time.time()
+    end = time.time()
     graphs['c'].inc()
     db=connect_db()
     values = request.get_json()
