@@ -44,7 +44,6 @@ def proxy_command_request(_base_url):
         rsp = requests.delete(_base_url.format(request.full_path))
         return check_rsp_code(rsp)
 
-@app.route("/store-metrics",methods=['GET'])
 @app.route('/stores', methods=['GET'])
 @app.route('/store/<store_id>', methods=['GET'])
 @app.route('/store/<store_id>/status', methods=['GET'])
@@ -72,7 +71,13 @@ def order_command(order_id=None, store_id=None):
 def menu_command(store_id=None):
     return proxy_command_request('http://menu-service:5000{}')
 
+@app.route('/menu-metrics', methods=['GET'])
+def menu_metrics():
+    rsp = requests.get("http://menu-service:5000/menu-metrics")
+    return rsp.text,rsp.status_code
 
-
-
+@app.route("/store-metrics",methods=['GET'])
+def store_metrics():
+    rsp = requests.get("http://store-service:5000/store-metrics")
+    return rsp.text,rsp.status_code
 
