@@ -8,6 +8,7 @@ See https://redislabs.com/blog/use-redis-event-store-communication-microservices
 
 ## Test
 - `python3 -m unittest client/client.py`
+- `pytest -v test_order_service.py`
 
 ## Stop
 - `docker-compose down`

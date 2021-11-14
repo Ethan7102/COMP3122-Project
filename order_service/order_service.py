@@ -24,7 +24,6 @@ def connect_db():
     return db
 
 
-#@app.route('/orders', methods=['POST'])
 @app.route('/order', methods=['POST'])#receive a order 
 def handle_order():
     db=connect_db()
@@ -56,13 +55,22 @@ def get_order(order_id):
 
 @app.route('/stores/<store_id>/created-orders', methods=['GET']) # get orders of a specific store with status "CREATED"
 def get_created_orders(store_id):
+    # get data from query parameters
+    limit = -1
+    if 'limit' in request.args:
+        limit = int(request.args['limit'])
     db=connect_db()
     orders_keys=db.hkeys("orders")
     created_orders= {"orders":[]}
+    count=0
     for orders_key in orders_keys:    
         order = json.loads(db.hget("orders",orders_key))
         if order["current_state"] == "CREATED" and order["store"]["id"] == store_id:
             created_orders["orders"].append({"id":orders_key, "current_state":order["current_state"], "placed_at":order["placed_at"]})
+            count+=1
+        if limit >= 0:
+            if limit == count:
+                break
     return created_orders,200
 
 @app.route('/stores/<store_id>/canceled-orders', methods=['GET']) # get orders of a specific store with status "CREATED"
@@ -127,7 +135,7 @@ def update_delivery_status(order_id):
     db=connect_db()
     if db.hexists("orders", order_id):
         order = json.loads(db.hget("orders",order_id))
-        if order["current_state"]=="ACCEPTED":
+        if order["current_state"]!="CREATED":
             values = request.get_json()
             if values["status"]=="started" or values["status"]=="arriving" or values["status"]=="delivered":
                 delivery={"id":str(uuid.uuid4()), "current_state":values["status"].upper()}

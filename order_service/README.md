@@ -10,7 +10,7 @@ curl -v http://localhost:5000/order/f9f363d1-e1c2-4595-b477-c649845bc953
 
 * /stores/<store_id>/created-orders
 ```
-curl -v http://localhost:5000/stores/c7f1dc2f-fabe-4997-845c-cad26fdcb894/created-orders
+curl -v http://localhost:5000/stores/c7f1dc2f-fabe-4997-845c-cad26fdcb894/created-orders?limit=5
 ```
 
 * /stores/<store_id>/canceled-orders
