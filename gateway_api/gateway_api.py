@@ -1,6 +1,7 @@
 import json
 
 import requests
+import redis
 
 from flask import request
 from flask import Flask
@@ -44,6 +45,16 @@ def proxy_command_request(_base_url):
         rsp = requests.delete(_base_url.format(request.full_path))
         return check_rsp_code(rsp)
 
+def authenticating_by_token(token):
+    pool = redis.ConnectionPool(
+    host='redis-authentication-service', port=6379, decode_responses=True)
+    db = redis.Redis(connection_pool=pool)
+    tokens = db.hvals('tokens')
+    if token in tokens:
+        return True
+    else:
+        return False
+
 @app.route('/stores', methods=['GET'])
 @app.route('/store/<store_id>', methods=['GET'])
 @app.route('/store/<store_id>/status', methods=['GET'])
@@ -84,5 +95,4 @@ def store_metrics():
 
 @app.route('/authentication/get_token', methods=['POST'])
 def authentication_command():
-    return '',204
     return proxy_command_request('http://authentication-service:5000{}')
