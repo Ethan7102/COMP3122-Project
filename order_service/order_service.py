@@ -1,32 +1,38 @@
-import atexit
 import json
-import os
-import re
+import requests
+import redis
+import uuid
+from flask import request
+from flask import Flask, jsonify
+from flask import Response
+import prometheus_client
+from prometheus_client.core import CollectorRegistry
+from prometheus_client import Summary, Counter, Histogram, Gauge
+
+import json
 import requests
 import uuid
 import time
 import redis
-import uuid
-import time
 from flask import request
 from flask import Flask, jsonify
+from urllib.parse import unquote
+from common.utils import check_rsp_code
+from lib.event_store import EventStore
+from flask import Response
+import prometheus_client
+from prometheus_client.core import CollectorRegistry
+from prometheus_client import Summary, Counter, Histogram, Gauge
+import time
 
 from common.utils import check_rsp_code
 from lib.event_store import EventStore
 
-
 app = Flask(__name__)
-
-#listening to event bus, when there is new not active store, print msg
-r = redis.Redis(host='redis-event-bus', port=6379, db=0)
-sub = r.pubsub()
-sub.subscribe('store_not_available_channel')
-
-
-
-
-
-
+_INF = float("inf")
+graphs = {}
+graphs['c'] = Counter('python_request_operations_total', 'The total number of processed requests')
+graphs['h'] = Histogram('python_request_duration_seconds', 'Histogram for the duration in seconds.', buckets=(1, 2, 5, 6, 10, _INF))
 
 def connect_db():
     pool = redis.ConnectionPool(host='redis-order-service', port=6379, decode_responses=True)
@@ -34,10 +40,8 @@ def connect_db():
     return db
 
 
-@app.route('/order', methods=['POST'])#receive a order
+@app.route('/order', methods=['POST'])#receive a order 
 def handle_order():
-    start = time.time()
-    end = time.time()
     graphs['c'].inc()
     db=connect_db()
     values = request.get_json()
@@ -54,26 +58,14 @@ def handle_order():
             rsp = requests.post(webhook_url, json=values)
             status_code=rsp.status_code
             time+=1
-
+        
         db.hset("orders",values["id"],json.dumps(values))
         return {"message":"order is created"}, 200
 
-
 @app.route('/order/<order_id>', methods=['GET'])
 def get_order(order_id):
+    graphs['c'].inc()
     db=connect_db()
-
-    #update "store_not_available" in db
-    for message in sub.listen():
-        if (isinstance(message.get('data'), bytes)):
-            storeID = message['data'].decode()
-            db.hset("store_not_available", storeID)
-
-
-    if db.hexists("store_not_available", store_id):
-        return {"Error": "Store_not_available"},409
-
-
     if db.hexists("orders", order_id):
         return json.loads(db.hget("orders",order_id)), 200
     else:
@@ -82,6 +74,7 @@ def get_order(order_id):
 @app.route('/stores/<store_id>/created-orders', methods=['GET']) # get orders of a specific store with status "CREATED"
 def get_created_orders(store_id):
     # get data from query parameters
+    graphs['c'].inc()
     limit = -1
     if 'limit' in request.args:
         limit = int(request.args['limit'])
@@ -89,7 +82,7 @@ def get_created_orders(store_id):
     orders_keys=db.hkeys("orders")
     created_orders= {"orders":[]}
     count=0
-    for orders_key in orders_keys:
+    for orders_key in orders_keys:    
         order = json.loads(db.hget("orders",orders_key))
         if order["current_state"] == "CREATED" and order["store"]["id"] == store_id:
             created_orders["orders"].append({"id":orders_key, "current_state":order["current_state"], "placed_at":order["placed_at"]})
@@ -101,10 +94,11 @@ def get_created_orders(store_id):
 
 @app.route('/stores/<store_id>/canceled-orders', methods=['GET']) # get orders of a specific store with status "CREATED"
 def get_canceled_orders(store_id):
+    graphs['c'].inc()
     db=connect_db()
     orders_keys=db.hkeys("orders")
     canceled_orders= {"orders":[]}
-    for orders_key in orders_keys:
+    for orders_key in orders_keys:    
         order = json.loads(db.hget("orders",orders_key))
         if order["current_state"] == "CANCELED" and order["store"]["id"] == store_id:
             canceled_orders["orders"].append({"id":orders_key, "current_state":order["current_state"], "placed_at":order["placed_at"]})
@@ -112,6 +106,7 @@ def get_canceled_orders(store_id):
 
 @app.route('/orders/<order_id>/accept_pos_order', methods=['POST'])#accept order
 def accept_order(order_id):
+    graphs['c'].inc()
     db=connect_db()
     if db.hexists("orders", order_id):
         order = json.loads(db.hget("orders",order_id))
@@ -127,13 +122,13 @@ def accept_order(order_id):
 
 @app.route('/orders/<order_id>/deny_pos_order', methods=['POST'])#deny order
 def deny_order(order_id):
+    graphs['c'].inc()
     db=connect_db()
     if db.hexists("orders", order_id):
         order = json.loads(db.hget("orders",order_id))
         if order["current_state"]=="CREATED" or order["current_state"]=="ACCEPTED":
             order["current_state"]="DENIED"
             db.hset("orders",order_id,json.dumps(order))
-            #store.publish('order', 'ACCEPTED', **accept_order)
             return '',204
         else:
             return {"error":"The order state is "+order["current_state"]+". Only the order with order state CREATED can be denied."},409
@@ -142,6 +137,7 @@ def deny_order(order_id):
 
 @app.route('/orders/<order_id>/cancel', methods=['POST'])#cancel order
 def cancel_order(order_id):
+    graphs['c'].inc()
     db=connect_db()
     if db.hexists("orders", order_id):
         order = json.loads(db.hget("orders",order_id))
@@ -158,6 +154,7 @@ def cancel_order(order_id):
 
 @app.route('/orders/<order_id>/restaurantdelivery/status', methods=['POST'])#update delivery status of an order
 def update_delivery_status(order_id):
+    graphs['c'].inc()
     db=connect_db()
     if db.hexists("orders", order_id):
         order = json.loads(db.hget("orders",order_id))
@@ -174,3 +171,12 @@ def update_delivery_status(order_id):
             return {"error":"The order state is "+order["current_state"]+". It cannot be updated the delivery status."},409
     else:
         return {"error": "not found"},404
+    
+@app.route("/order-metrics", methods=['GET'])
+def order_requests_count():
+    res = []
+    for k,v in graphs.items():
+        res.append(prometheus_client.generate_latest(v))
+    return Response(res, mimetype="text/plain")
+
+
