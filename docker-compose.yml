@@ -51,7 +51,9 @@ services:
   authentication-service:
     image: authentication-service
     container_name: authentication-service
-    build: authentication-service
+    build:
+      context: ./authentication_service
+      dockerfile: Dockerfile
     volumes:
       - .:/app
       - logvolume01:/var/log
