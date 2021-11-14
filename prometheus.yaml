@@ -28,3 +28,9 @@ scrape_configs:
     metrics_path: /menu-metrics
     static_configs:
     - targets: ['menu-service:5000']
+
+    #metric exporter of the python app
+  - job_name: 'authentication-service'
+    metrics_path: /authentication-metrics
+    static_configs:
+    - targets: ['authentication-service:5000']

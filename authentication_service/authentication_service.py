@@ -46,6 +46,8 @@ def connect_db():
 
 @app.route('/authentication/get_token', methods=['POST'])
 def get_token():
+    start = time.time()
+    graphs['c'].inc()
     if initialization:
         initialize()
     values = request.get_json()
@@ -55,5 +57,16 @@ def get_token():
         if password == values["password"]:
             token = secrets.token_hex(16)
             db.hset("tokens", values["username"], token)
+            end = time.time()
+            graphs['h'].observe(end - start)
             return {"Your token": token}, 200
+    end = time.time()
+    graphs['h'].observe(end - start)
     return {"error": "username or password is incorrect."}, 400
+
+@app.route("/authentication-metrics", methods=['GET'])
+def requests_count():
+    res = []
+    for k,v in graphs.items():
+        res.append(prometheus_client.generate_latest(v))
+    return Response(res, mimetype="text/plain") 
