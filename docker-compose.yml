@@ -111,6 +111,8 @@ services:
     expose:
       - 9100
 
+
+
   #prometheus
   prometheus:
     image: prom/prometheus:v2.30.3
@@ -123,6 +125,7 @@ services:
     expose:
       - 9090
 
+      
   #grafana
   grafana:
     image: grafana/grafana
@@ -133,7 +136,7 @@ services:
       - GF_SECURITY_ADMIN_USER=comp3122
       - GF_SECURITY_ADMIN_PASSWORD=12345
     depends_on:
-      - prometheus
+      - nodeExporter
     ports:
       - '3000:3000'
 
