@@ -81,6 +81,7 @@ def store_metrics():
     rsp = requests.get("http://store-service:5000/store-metrics")
     return rsp.text,rsp.status_code
 
+
 @app.route('/authentication/get_token', methods=['POST'])
 def authentication_command():
     return '',204
