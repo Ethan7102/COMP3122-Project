@@ -59,6 +59,10 @@ def handle_order():
             status_code=rsp.status_code
             time+=1
         
+        #check the event bus whether store is active
+        if db.hexists("storeStatus", values["store"]["id"]):
+            return {"Error": "Store not available"},409
+        
         db.hset("orders",values["id"],json.dumps(values))
         return {"message":"order is created"}, 200
 
@@ -66,12 +70,6 @@ def handle_order():
 def get_order(order_id):
     graphs['c'].inc()
     db=connect_db()
-    
-    
-    #check the event bus whether store is active
-    if db.hexists("storeStatus", store_id):
-        return {"Error": "Store not available"},409
-    
     
     if db.hexists("orders", order_id):
         return json.loads(db.hget("orders",order_id)), 200
