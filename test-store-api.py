@@ -78,7 +78,7 @@ def test_get_status_5000_check_status_code_equals_200():
 def test_get_status_5000_check_return_json():
     response = requests.get("http://localhost:5000/store/"+ store_id + "/status", headers=token)
     json_data = json.loads(db.hget("stores","7e973b58-40b7-4bd8-b01c-c7d1cbd194f6"))
-    result = '{ "status" : ' + '"'+ json_data["status"] +'"' + ',' + '"offlineReason"'+' : ' +  '"N/A"' +'}'
+    result = {'offlineReason' : 'N/A' ,'status': 'active'}
     assert response.json() == result
 
 
@@ -96,9 +96,25 @@ def test_set_status_5000_check_status_code_equals_200():
 
 def test_set_status_5000_check_return_json():
     response = requests.get("http://localhost:5000/store/" +store_id+ "/status", headers=token)
-    result = '{ "status" : ' + '"'+ '"PAUSED"' +'"' + ',' + '"offlineReason"'+' : ' +  '"NA"' +'}'
+    result = {'offlineReason' : 'N/A' ,'status': 'PAUSED'}
     
     assert response.json() == result
+    
+    
+    
+    
+#test pub and sub event bus function    
+def test_listener_5000_check_update_db():
+    newStatus = "PAUSED"
+    reason = 'NA'
+    response = requests.get("http://localhost:5000/store/" +store_id+ "/setStatus?newStatus="+newStatus+"&reason="+reason, headers=token)
+
+    #connect to the db of order api
+    pool2 = redis.ConnectionPool(host='localhost', port=6380, decode_responses=True)
+    db2 = redis.Redis(connection_pool=pool2)
+
+    #check the subscriber is updated the db
+    assert db2.hexists("storeStatus", store_id) == 1
 
 
 #get store holiday-hours with specific store id
@@ -107,7 +123,7 @@ def test_get_holiday_hours_5000_check_status_code_equals_200():
     response = requests.get("http://localhost:5000/store/" +store_id+ "/holiday-hours", headers=token)
     assert response.status_code == 200
 
-def test_get_status_5000_check_return_json():
+def test_get_holiday_hours_5000_check_return_json():
     response = requests.get("http://localhost:5000/store/" +store_id+ "/holiday-hours", headers=token)
     json_data = json.loads(db.hget("holidayHours",store_id))
 
@@ -124,7 +140,7 @@ def test_set_holiday_hours_5000_check_status_code_equals_200():
 
     assert response.status_code == 200
 
-def test_set_status_5000_check_return_json():
+def test_set_holiday_hours_5000_check_return_json():
 
 
     response = requests.get("http://localhost:5000/store/" +store_id+ "/holiday-hours", headers=token)
