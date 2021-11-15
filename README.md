@@ -1,5 +1,5 @@
-## Eat API
-# Start
+# Eat API
+## Start
 - `docker-compose up`
 
  Test menu, order and store microservices
@@ -8,7 +8,7 @@
 - `pytest -v test_menu_service.py`
 - `pytest -v test_store_service.py`
 
-# Stop
+## Stop
 - `docker-compose down`
 
 
