@@ -12,7 +12,7 @@ db.hset("stores", "7e973b58-40b7-4bd8-b01c-c7d1cbd194f6",json.dumps(tempStore1))
 
 
 #insert store 2 for test
-tempStore2={"name": "West Coast Sushi", "store_id": "15e652b8-40b5-4b58-b01d-c7d15bd114d6", "location": { "address": "898 E 25th Street", "address_2": "Floor 2", "city": "New York", "country": "US", "postal_code": "10001", "state": "NY", "latitude": 49.7527198, "longitude": -80.00635 }, "contact_emails": [ "owner@example.com", "announcements+uber@example.com", "store-east@example.com" ], "raw_hero_url": "https://www.example.com/hero_url_east.png", "price_bucket": "$$$", "avg_prep_time": 5,"status": "active","partner_store_id": "541325","timezone": "America/New_York"}
+tempStore2={"name": "West Coast Sushi", "store_id": "85e652b8-40b5-4b58-b01d-c7d15bd114d6", "location": { "address": "898 E 25th Street", "address_2": "Floor 2", "city": "New York", "country": "US", "postal_code": "10001", "state": "NY", "latitude": 49.7527198, "longitude": -80.00635 }, "contact_emails": [ "owner@example.com", "announcements+uber@example.com", "store-east@example.com" ], "raw_hero_url": "https://www.example.com/hero_url_east.png", "price_bucket": "$$$", "avg_prep_time": 5,"status": "active","partner_store_id": "541325","timezone": "America/New_York"}
 db.hset("stores", "85e652b8-40b5-4b58-b01d-c7d15bd114d6",json.dumps(tempStore2))
 
 
@@ -41,14 +41,6 @@ def test_store_list_5000_check_status_code_equals_200():
     response = requests.get("http://localhost:5000/stores", headers=token)
     assert response.status_code == 200
 
-def test_store_list_5000_check_return_json():
-    response = requests.get("http://localhost:5000/stores", headers=token)
-    data = db.hgetall('stores')
-    json_data = json.dumps(data)
-    json_without_slash = json.loads(json_data)
-
-    assert response.json() == json_without_slash
-  
 
 #get store with specific store id
 #@app.route("/store/<store_id>")

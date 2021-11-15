@@ -57,16 +57,20 @@ def get_store_list():
         
     else:
 
-        #remove all backslash in data
-        json_data = json.dumps(db.hgetall('stores'))
-        json_without_slash = json.loads(json_data)
-        json_without_slash2 = json.loads(json_without_slash)
+        #To remove slash bug
+        #str_data = str(db.hgetall('stores'))
+        #json_data = json.dumps(str_data)
 
+        box_keys=db.hkeys("stores")
+        boxes= {"stores":[]}
+        for box_key in box_keys:
+            box = json.loads(db.hget("stores",box_key))
+            boxes['stores'].append(box) 
 
         #metrics work
         end = time.time()
         graphs['h'].observe(end - start)
-        return json_without_slash2, 200
+        return boxes, 200
         
 
 #show the store info with specific store id
