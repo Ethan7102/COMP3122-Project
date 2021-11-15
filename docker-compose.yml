@@ -143,6 +143,20 @@ services:
     expose:
       - 3000
 
+  #listener that is always listening to store_status_change_channel
+  listener-service:
+    image: listener-service
+    container_name: listener-service
+    build: listener_service
+    volumes:
+      - .:/app
+      - logvolume01:/var/log
+    links:
+      - redis-event-bus
+      - redis-order-service
+      - redis-store-service
+
+
 volumes:
   logvolume01: {}
 networks:

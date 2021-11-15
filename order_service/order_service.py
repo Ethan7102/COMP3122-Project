@@ -66,6 +66,13 @@ def handle_order():
 def get_order(order_id):
     graphs['c'].inc()
     db=connect_db()
+    
+    
+    #check the event bus whether store is active
+    if db.hexists("storeStatus", store_id):
+        return {"Error": "Store not available"},409
+    
+    
     if db.hexists("orders", order_id):
         return json.loads(db.hget("orders",order_id)), 200
     else:

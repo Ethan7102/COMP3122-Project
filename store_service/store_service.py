@@ -145,15 +145,15 @@ def set_status(store_id):
     #metrics work
     start = time.time()
     graphs['c'].inc()
+    
+    
 
     newStatus = request.args.get('newStatus')
 
-    #use event bus to publish that store is not active anymore
+    #use event bus to publish that store change status
     if( newStatus != "active"):
 
-        r.publish('store_not_available_channel', store_id
-
-    )
+        r.publish('store_status_change_channel', store_id)
 
 
     #why edit the status
