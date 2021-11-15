@@ -1,4 +1,4 @@
-* /order: create an order
+* /order: handle an order
 ```
 curl -X POST -v http://localhost:5000/order -H 'authorization: 740becc4b623786cc812c956a5afb30e' -H 'Content-Type: application/json' -d @./order_service/sample_order_data.json
 ```

@@ -160,7 +160,6 @@ def test_deny_order_with_incorrect_state(): # test denying an order that the sta
     response = requests.post("http://localhost:5000/orders/"+order_id+"/deny_pos_order", json={ "reason": { "explanation":"failed to submit order", "code":"ITEM_AVAILABILITY", "out_of_stock_items":[ "540cb880-0286-417b-9c6c-be586fd50f76", "094f3308-4389-4ce5-bf30-ce9e09c6ed1c" ], "invalid_items":[ "1cd26db9-6be3-4b0a-9216-e4868c5d79ec" ] } }, headers=token)
     assert response.status_code == 409
 
-
 def test_cancel_order(): # test cancelling an order
     #place an order
     order_id = str(uuid.uuid4())
