@@ -1,0 +1,15 @@
+# config file version
+apiVersion: 1
+
+notifiers:
+  - name: alert-notification-channel
+    type: discord
+    uid: notifier1
+    is_default: true
+    send_reminder: true
+    frequency: 1h
+    disable_resolve_message: false
+    # See `Supported Settings` section for settings supported for each
+    # alert notification type.
+    settings:
+      url: https://discord.com/api/webhooks/909707894499467334/G4VJzpF7P9XWatWl8cOPb5vtfN8X1EPnLYXq9MflPjTqsNvC5EWhdEXYLmr41PeJIXtb
