@@ -94,7 +94,7 @@ def get_store(store_id):
 
 
 
-        #metrics work
+        #metrics statics work
         end = time.time()
         graphs['h'].observe(end - start)
         return {"Error": "Store not found"},404

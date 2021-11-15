@@ -26,12 +26,6 @@ response = requests.post('http://localhost:5000/authentication/get_token', json=
 token = {"authorization": response.json()['token']}
 
 
-#print(db.hget("stores", "7e973b58-40b7-4bd8-b01c-c7d1cbd194f6"))
-#print("\n")
-#print(db.hget("holidayHours", "7e973b58-40b7-4bd8-b01c-c7d1cbd194f6"))
-#print("\n")
-#print(db.hgetall("stores"))
-
 
 
 #-------------------------------------------Unit test for store API start-------------------------------------------------#
@@ -42,9 +36,9 @@ def test_store_list_5000_check_status_code_equals_200():
     assert response.status_code == 200
 
 
-#get store with specific store id
-#@app.route("/store/<store_id>")
 
+#get store info with specific store id
+#@app.route("/store/<store_id>")
 store_id = "7e973b58-40b7-4bd8-b01c-c7d1cbd194f6"
 
 def test_store_id_5000_check_status_code_equals_200():
