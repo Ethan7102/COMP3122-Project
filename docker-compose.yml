@@ -132,6 +132,7 @@ services:
     volumes:
       - ./grafana/dashboards:/etc/grafana/provisioning/dashboards/
       - ./grafana/datasources:/etc/grafana/provisioning/datasources/
+      - ./grafana/notifiers:/etc/grafana/provisioning/notifiers/
     environment:
       - GF_SECURITY_ADMIN_USER=comp3122
       - GF_SECURITY_ADMIN_PASSWORD=12345
