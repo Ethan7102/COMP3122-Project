@@ -1,32 +1,15 @@
 import json
 import requests
-import redis
-import uuid
-from flask import request
-from flask import Flask, jsonify
-from flask import Response
-import prometheus_client
-from prometheus_client.core import CollectorRegistry
-from prometheus_client import Summary, Counter, Histogram, Gauge
-
-import json
-import requests
 import uuid
 import time
 import redis
 from flask import request
 from flask import Flask, jsonify
 from urllib.parse import unquote
-from common.utils import check_rsp_code
-from lib.event_store import EventStore
 from flask import Response
 import prometheus_client
 from prometheus_client.core import CollectorRegistry
 from prometheus_client import Summary, Counter, Histogram, Gauge
-import time
-
-from common.utils import check_rsp_code
-from lib.event_store import EventStore
 
 app = Flask(__name__)
 _INF = float("inf")

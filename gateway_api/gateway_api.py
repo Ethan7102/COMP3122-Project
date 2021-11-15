@@ -7,8 +7,6 @@ import redis
 from flask import request
 from flask import Flask
 
-from common.utils import check_rsp_code
-
 initialization = 1
 
 app = Flask(__name__)
@@ -39,12 +37,6 @@ def proxy_command_request(_base_url):
             return '',204
         else:    
             return rsp.json(), rsp.status_code
-
-    # handle DELETE
-    if request.method == 'DELETE':
-        rsp = requests.delete(_base_url.format(request.full_path))
-        return check_rsp_code(rsp)
-
 
 def initialize():
     pool = redis.ConnectionPool(host='redis-authentication-service', port=6379, decode_responses=True)

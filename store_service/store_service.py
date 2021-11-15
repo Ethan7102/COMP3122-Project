@@ -9,8 +9,6 @@ import redis
 from flask import request
 from flask import Flask, jsonify
 from urllib.parse import unquote
-from common.utils import check_rsp_code
-from lib.event_store import EventStore
 from flask import Response
 import prometheus_client
 from prometheus_client.core import CollectorRegistry

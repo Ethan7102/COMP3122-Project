@@ -14,7 +14,6 @@ import prometheus_client
 from prometheus_client.core import CollectorRegistry
 from prometheus_client import Summary, Counter, Histogram, Gauge
 import time
-from lib.event_store import EventStore
 
 app = Flask(__name__)
 _INF = float("inf")
