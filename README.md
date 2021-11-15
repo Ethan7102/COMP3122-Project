@@ -14,3 +14,8 @@ See https://redislabs.com/blog/use-redis-event-store-communication-microservices
 
 ## Stop
 - `docker-compose down`
+
+
+prometheus:
+username: comp3122
+pw: 12345
