@@ -9,7 +9,7 @@
 - `pytest -v test_store_service.py`
 
 ## Stop
-- `docker-compose down`
+- `docker-compose down -`
 
 
 prometheus:
