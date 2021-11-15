@@ -4,7 +4,7 @@
     "external_reference_id": "Order-123",
     "current_state": "CREATED",
     "store": {
-      "id": "15e652b8-40b5-4b58-b01d-c7d15bd114d6",
+      "id": "85e652b8-40b5-4b58-b01d-c7d15bd114d6",
       "name": "Harry's Hamburgers",
       "external_reference_id": "HARRY_123"
     },
