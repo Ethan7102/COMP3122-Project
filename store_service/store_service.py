@@ -262,7 +262,7 @@ def set_holiday_hours(store_id):
 
 
 
-
+#see metrics of store api
 @app.route("/store-metrics", methods=['GET'])
 def requests_count():
     res = []
