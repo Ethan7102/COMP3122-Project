@@ -60,12 +60,13 @@ def get_store_list():
         #remove all backslash in data
         json_data = json.dumps(db.hgetall('stores'))
         json_without_slash = json.loads(json_data)
+        json_without_slash2 = json.loads(json_without_slash)
 
 
         #metrics work
         end = time.time()
         graphs['h'].observe(end - start)
-        return json.dumps(json_without_slash), 200
+        return json_without_slash2, 200
         
 
 #show the store info with specific store id
@@ -262,7 +263,7 @@ def set_holiday_hours(store_id):
 
 
 
-
+#see metrics of store api
 @app.route("/store-metrics", methods=['GET'])
 def requests_count():
     res = []
